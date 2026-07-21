@@ -186,6 +186,12 @@ export async function POST(request: Request) {
         message = err.message;
       } else if (err.code === "insufficient_credit") {
         message = "Créditos insuficientes na conta HeyGen. Adicione créditos e tente novamente.";
+      } else if (/no face detected/i.test(err.message)) {
+        message =
+          "Nenhum rosto foi detectado na imagem enviada para criar o avatar. Envie uma foto de retrato: um rosto humano de frente, nítido e bem iluminado.";
+      } else if (err.status === 400) {
+        // Repassa o motivo real da HeyGen para erros de validação, em vez de uma mensagem genérica.
+        message = `A HeyGen recusou a solicitação: ${err.message}`;
       }
       return NextResponse.json({ error: message }, { status: err.status });
     }

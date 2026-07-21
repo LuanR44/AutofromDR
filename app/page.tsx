@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ImageDropzone } from "./components/ImageDropzone";
 import { StatusPanel } from "./components/StatusPanel";
 import { ResultPanel } from "./components/ResultPanel";
+import { SearchableSelect } from "./components/SearchableSelect";
 import { SUPPORTED_LANGUAGES, getLanguageByCode } from "@/lib/languages";
 import { estimateSpeechDurationSeconds } from "@/lib/script";
 import type {
@@ -347,19 +348,19 @@ export default function Home() {
           {avatarMode === "existing" ? (
             <div className="flex flex-col gap-2">
               <label className={labelClass}>Avatar</label>
-              <select
-                className={inputClass}
+              <SearchableSelect
                 value={avatarId}
-                onChange={(e) => setAvatarId(e.target.value)}
+                onChange={setAvatarId}
                 disabled={catalogLoading}
-              >
-                <option value="">{catalogLoading ? "Carregando avatares…" : "Selecione um avatar"}</option>
-                {avatars.map((a) => (
-                  <option key={a.avatarId} value={a.avatarId}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
+                placeholder={catalogLoading ? "Carregando avatares…" : "Selecione um avatar"}
+                emptyLabel="Nenhum avatar encontrado."
+                options={avatars.map((a) => ({
+                  value: a.avatarId,
+                  label: a.name,
+                  sublabel: a.gender,
+                  imageUrl: a.previewImageUrl,
+                }))}
+              />
             </div>
           ) : (
             <ImageDropzone
@@ -373,20 +374,18 @@ export default function Home() {
 
           <div className="flex flex-col gap-2">
             <label className={labelClass}>Voz</label>
-            <select
-              className={inputClass}
+            <SearchableSelect
               value={voiceId}
-              onChange={(e) => setVoiceId(e.target.value)}
+              onChange={setVoiceId}
               disabled={catalogLoading}
-            >
-              <option value="">{catalogLoading ? "Carregando vozes…" : "Selecione uma voz"}</option>
-              {filteredVoices.map((v) => (
-                <option key={v.voiceId} value={v.voiceId}>
-                  {v.name} ({v.language}
-                  {v.gender ? `, ${v.gender}` : ""})
-                </option>
-              ))}
-            </select>
+              placeholder={catalogLoading ? "Carregando vozes…" : "Selecione uma voz"}
+              emptyLabel="Nenhuma voz encontrada."
+              options={filteredVoices.map((v) => ({
+                value: v.voiceId,
+                label: `${v.name} (${v.language}${v.gender ? `, ${v.gender}` : ""})`,
+                sublabel: v.language,
+              }))}
+            />
           </div>
         </section>
 
